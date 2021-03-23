@@ -60,4 +60,6 @@ class Overwatch:
 # Example of a user who uses platform is pc, region us, and battle tag of player of cats-11481 in Overwatch
 ov = Overwatch('pc', 'us', 'cats-11481')
 ov.get_filers()
+print("hey")
+print("testing push")
 
