@@ -53,13 +53,39 @@ class Overwatch:
             level = self.result_json['level']
             rating = self.result_json['rating']
             return [name, games_won, level, rating]
-        else:
-            return None
+        return None
 
+    def analyze_stats(self, player):
+        """
+        analyze the stats of a player and return an integer value representing its final
+        score after evaluation
+
+        :param player: Battle Tag of player
+        :return: evaluation score
+        """
+        if player == self.test_get_player_info()[0]:
+            player_stats = self.test_get_player_info()
+            return 0.6 * player_stats[1] + 0.8 * player_stats[2] + 0.8 * player_stats[3]  # example calculations
+        return "Invalid player"
+
+    def compare_2players(self, player1, player2):
+        """
+        compares stats of 2 players, and returns the winning player
+
+        :param player1: Battle Tag of player1
+        :param player2: Battle Tag of player 2
+        :return: player with higher stats, else return a message saying players are equal
+        """
+        if self.analyze_stats(player1) > self.analyze_stats(player2):
+            return player1
+        elif self.analyze_stats(player1) < self.analyze_stats(player2):
+            return player2
+        return "Players are equal in comparison"
 
 # Example of a user who uses platform is pc, region us, and battle tag of player of cats-11481 in Overwatch
+
+
 ov = Overwatch('pc', 'us', 'cats-11481')
 ov.get_filers()
 print("hey")
 print("testing push")
-
