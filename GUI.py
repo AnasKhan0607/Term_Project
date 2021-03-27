@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from apicollect import Overwatch
 
+
 class FirstGUI:
     """
     This is pertaining to Overwatch only, Remember that in the apicollect.py file,
@@ -27,16 +28,34 @@ class FirstGUI:
         Idea: Maybe we can use validate commands for the entries
         """
         # Entry for user to put in platform
+
+        # platform_label_text = StringVar()
+        # platform_label_text.set("Enter game platform (pc, etc)")
+        # self.label1 = Label(app, textvariable=platform_label_text, height=4)
+        # self.label1.grid(row=2, column=0)
+
         platform_id = StringVar()
         self.first_gamer_plat = Entry(self.frame, textvariable=platform_id)
         self.first_gamer_plat.grid(row=2, column=1)
 
         # Entry for user to put in region
+
+        # region_label_text = StringVar()
+        # region_label_text.set("Enter game region (us, eu, asia)")
+        # self.label2 = Label(app, textvariable=region_label_text, height=4)
+        # self.label2.grid(row=3, column=0)
+
         region_id = StringVar()
-        self.first_gamer_reg= Entry(self.frame, textvariable=region_id)
+        self.first_gamer_reg = Entry(self.frame, textvariable=region_id)
         self.first_gamer_reg.grid(row=3, column=1)
 
         # Entry for user to put in battle_id
+
+        # battleID_label_text = StringVar()
+        # battleID_label_text.set("Your battlenet tag, replacing the # with a -")
+        # self.label3 = Label(app, textvariable=battleID_label_text, height=4)
+        # self.label3.grid(row=3, column=0)
+
         battle_id = StringVar()
         self.first_gamer_batt = Entry(self.frame, textvariable=battle_id)
         self.first_gamer_batt.grid(row=4, column=1)
