@@ -87,5 +87,4 @@ class Overwatch:
 
 ov = Overwatch('pc', 'us', 'cats-11481')
 ov.get_filers()
-print("hey")
-print("testing push")
+
