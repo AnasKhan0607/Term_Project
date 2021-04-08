@@ -11,6 +11,7 @@ class FirstGUI(tk.Tk):
     """
     def __init__(self):
         tk.Tk.__init__(self)
+        self.title("Statistical Tracker for:")
         self._frame = None
         self.change_frame(PageOne)
 
