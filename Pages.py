@@ -75,12 +75,11 @@ class PageTwo(tk.Frame):
         self.ow_tree.heading("Platform", text="Platform", anchor=W)
         self.ow_tree.heading("Region", text="Region", anchor=CENTER)
 
-
         self.ow_tree.grid(row=0, column=2, rowspan=5, padx=5, pady=5, sticky=E + W + S + N)
 
         self.platform_chosen = StringVar()
         self.region_chosen = StringVar()
-        self.battletag_chosen = StringVar()
+        self.battle_id = StringVar()
 
         tk.Label(self, text="Player 1").grid(row=1, column=0, columnspan=2)
 
@@ -104,18 +103,25 @@ class PageTwo(tk.Frame):
 
         tk.Label(self, text="Battle Tag:").grid(row=4, column=0, columnspan=1)
 
-        self.battle_id = StringVar()
+        self.battle_id.trace("w", lambda name, index, mode, new_id=self.battle_id: self.validate_tag(new_id))
         self.gamer_tag = Entry(self, textvariable=self.battle_id)
+
         self.gamer_tag.grid(row=4, column=1)
 
         self.add_btn = Button(self, text='Add Player', command=self.add_player)
         self.add_btn.grid(row=0, column=4)
-        self.add_btn = Button(self, text='Remove Player(s)', command=self.remove_players)
+        self.add_btn = Button(self, text='Remove Player(s)', command=self.validate_tag)
         self.add_btn.grid(row=1, padx=5, column=4)
         self.add_btn = Button(self, text='Clear', command=self.clear)
         self.add_btn.grid(row=2, column=4)
         self.back_btn = Button(self, text='Go back', command=lambda: parent.change_frame(PageOne)).grid(row=3, column=4)
         self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageThree)).grid(row=4, column=4)
+
+
+
+    def validate_tag(self, id):
+        if "#" in id.get():
+            self.battle_id.set(self.battle_id.get().replace("#", "-"))
 
     def add_player(self):
 
