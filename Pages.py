@@ -28,13 +28,14 @@ class PageOne(tk.Frame):
         self.game_choices['values'] = ['Overwatch', 'Fortnite', 'Cold War', 'WoW']
         self.game_choices.grid(row=1, column=1)
 
+
         """
         Idea: Maybe we can use validate commands for the entries
         """
 
-        self.sub_btn = Button(self, text='Submit', command=lambda: self.testing(parent)).grid(
-            row=2, column=1)
-        # self.sub_btn.grid(row=5, column=3)
+        self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageTwo))
+        self.sub_btn.grid(row=2, column=1)
+        self.sub_btn["state"] = DISABLED
 
         self.pack()
         # If a game option is selected call the callback function
@@ -42,10 +43,10 @@ class PageOne(tk.Frame):
 
     def callback(self, event_object):
         self.game = event_object.widget.get()
+        if self.game != "Select a game":
+            self.sub_btn["state"] = NORMAL
 
-    def testing(self, parent):
-        if self.game_choices.get() != "Select a game":
-            parent.change_frame(PageTwo)
+
 
 
 class PageTwo(tk.Frame):
@@ -74,8 +75,6 @@ class PageTwo(tk.Frame):
         self.ow_tree.heading("Platform", text="Platform", anchor=W)
         self.ow_tree.heading("Region", text="Region", anchor=CENTER)
 
-        # Add Data
-        # ow_tree.insert('', index='end', iid=0, text="Player", values=("Yash", "pc", "us"))
 
         self.ow_tree.grid(row=0, column=2, rowspan=5, padx=5, pady=5, sticky=E + W + S + N)
 
@@ -108,7 +107,6 @@ class PageTwo(tk.Frame):
         self.battle_id = StringVar()
         self.gamer_tag = Entry(self, textvariable=self.battle_id)
         self.gamer_tag.grid(row=4, column=1)
-        window = tk.Tk()
 
         self.add_btn = Button(self, text='Add Player', command=self.add_player)
         self.add_btn.grid(row=0, column=4)
