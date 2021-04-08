@@ -70,7 +70,7 @@ class PageTwo(tk.Frame):
         self.ow_tree.column("Platform", anchor=CENTER, width=80)
         self.ow_tree.column("Region", anchor=W, width=60)
         # Create the headings
-        self.ow_tree.heading("#0", text="Label", anchor=W)
+        self.ow_tree.heading("#0", text="Player #", anchor=W)
         self.ow_tree.heading("Battle Tag", text="Battle Tag", anchor=CENTER)
         self.ow_tree.heading("Platform", text="Platform", anchor=W)
         self.ow_tree.heading("Region", text="Region", anchor=CENTER)
