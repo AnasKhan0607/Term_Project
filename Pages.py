@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 from apicollect import Overwatch
+from PIL import ImageTk, Image
+import os
 
 """
 Sources:
@@ -23,23 +25,26 @@ class PageOne(tk.Frame):
 
         self.game = None
         self.labelSelect = Label(self, text='Choose a game to find stats to compare between multiple players')
-        self.labelSelect.grid(row=0, column=1)
+        self.labelSelect.grid(row=1, column=1)
         self.game_chosen = StringVar()
         # Create a dropdown menu
         self.game_choices = ttk.Combobox(self, state="readonly", textvariable=self.game_chosen, width=30)
         # Default text shown
         self.game_choices.set("Select a game")
         # Possible games to choose from: Cold war and WoW are examples for now
-        self.game_choices['values'] = ['Overwatch', 'Fortnite', 'Cold War', 'WoW']
-        self.game_choices.grid(row=1, column=1)
+        self.game_choices['values'] = ['Overwatch']
+        self.game_choices.grid(row=2, column=1)
 
 
         """
         Idea: Maybe we can use validate commands for the entries
         """
 
+        img = ImageTk.PhotoImage(Image.open(r"C:\Users\maste\Desktop\CCT211\Term_Project\logo.png").resize((475, 221)))
+        self.panel = Label(self, image = img)
+        self.panel.grid(row=0, column=1, columnspan= 4)
         self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageTwo, "Hello"))
-        self.sub_btn.grid(row=2, column=1)
+        self.sub_btn.grid(row=3, column=1)
         self.sub_btn["state"] = DISABLED
 
         self.pack()
@@ -64,6 +69,7 @@ class PageTwo(tk.Frame):
         parent.title('Statistical Tracker for: Overwatch')
         tk.Label(self, text="Player information:").grid(row=0, column=0, columnspan=2)
         self.num_players = 0
+        self.players = []
 
         self.parent = parent
 
@@ -133,12 +139,12 @@ class PageTwo(tk.Frame):
         try:
             o = Overwatch(self.platform_chosen.get(), self.region_chosen.get(), self.battle_id.get())
 
-            if o.result:
+            if o.result and self.battle_id.get() not in self.players:
                 if not self.parent.game_filters:
                     self.parent.game_filters = o.get_filters()
                     self.parent.displayed_stats = o.displayed_filters
 
-
+                self.players.append(self.battle_id.get())
                 self.num_players += 1
                 self.parent.all_players.extend([o])
 
@@ -148,9 +154,6 @@ class PageTwo(tk.Frame):
                 self.gamer_tag.delete(0, END)
                 self.platform_choices.set('Select a platform')
                 self.region_choices.set('Select a region')
-
-
-
 
             else:
                 messagebox.showinfo('Error!', 'You have entered an invalid profile!')
@@ -178,7 +181,7 @@ class PageThree(tk.Frame):
         self.parent = parent
 
         self.Label_Stats = Label(self, text='Choose at least two stats to compare')
-        self.Label_Stats.grid(row=0, column=1, columnspan = 2)
+        self.Label_Stats.grid(row=0, column=1, columnspan=2)
 
         self.gameplay = StringVar()
         self.qp_btn = Radiobutton(self, text ="Quick Play", variable = self.gameplay, value = "quickPlayStats", command = lambda: self.gameplay_chosen(), tristatevalue=0)
@@ -204,7 +207,9 @@ class PageThree(tk.Frame):
         self.scrollbar['command'] = self.filter_lb.yview
 
         self.sbt_stats = Button(self, text='Submit', command=lambda: parent.change_frame(PageFour))
+        self.back_btn = Button(self, text='Go back', command=lambda: parent.change_frame(PageTwo))
         self.sbt_stats.grid(row=3, column=1)
+        self.back_btn.grid(row=3, column=2)
         self.sbt_stats["state"] = DISABLED
 
     def selected_stats(self, lb):
@@ -253,6 +258,7 @@ class PageFour(tk.Frame):
         self.best_in_game_index = 0
         self.game_outcome_index = 0
         self.awards_index = 0
+        self.back_btn = Button(self, text='Go back', command=lambda: parent.change_frame(PageThree)).grid(row=3, column=2)
 
 
 
