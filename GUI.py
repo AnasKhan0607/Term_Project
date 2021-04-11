@@ -4,7 +4,6 @@ import tkinter as tk
 from Pages import PageOne
 from apicollect import Overwatch
 
-
 class FirstGUI(tk.Tk):
     """
     This is pertaining to Overwatch only, Remember that in the apicollect.py file,
@@ -27,7 +26,6 @@ class FirstGUI(tk.Tk):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.pack()
-
 
 if __name__ == "__main__":
     app = FirstGUI()
