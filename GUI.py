@@ -14,8 +14,13 @@ class FirstGUI(tk.Tk):
         self.title("Statistical Tracker for:")
         self._frame = None
         self.change_frame(PageOne)
+        self.all_players = []
+        self.game_filters = {}
+        self.displayed_stats = []
+        self.compared_stats = []
+        self.game_mode = None
 
-    def change_frame(self, change_frame):
+    def change_frame(self, change_frame, *player_info):
         new_frame = change_frame(self)
         if self._frame is not None:
             self._frame.destroy()

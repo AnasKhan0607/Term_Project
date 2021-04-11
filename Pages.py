@@ -9,7 +9,12 @@ Sources:
 https://www.youtube.com/watch?v=YTqDYmfccQU
 https://www.delftstack.com/howto/python-tkinter/how-to-switch-frames-in-tkinter/
 https://www.youtube.com/watch?v=7JoMTQgdxg0
+https://stackoverflow.com/questions/13828531/problems-in-python-getting-multiple-selections-from-tkinter-listbox
 """
+
+
+
+
 
 
 class PageOne(tk.Frame):
@@ -33,7 +38,7 @@ class PageOne(tk.Frame):
         Idea: Maybe we can use validate commands for the entries
         """
 
-        self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageTwo))
+        self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageTwo, "Hello"))
         self.sub_btn.grid(row=2, column=1)
         self.sub_btn["state"] = DISABLED
 
@@ -60,7 +65,8 @@ class PageTwo(tk.Frame):
         tk.Label(self, text="Player information:").grid(row=0, column=0, columnspan=2)
         self.num_players = 0
 
-        # self.all_players = []
+        self.parent = parent
+
 
         self.ow_tree = ttk.Treeview(self)
         # Create the columns
@@ -118,7 +124,6 @@ class PageTwo(tk.Frame):
         self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageThree)).grid(row=4, column=4)
 
 
-
     def validate_tag(self, id):
         if "#" in id.get():
             self.battle_id.set(self.battle_id.get().replace("#", "-"))
@@ -127,14 +132,26 @@ class PageTwo(tk.Frame):
 
         try:
             o = Overwatch(self.platform_chosen.get(), self.region_chosen.get(), self.battle_id.get())
+
             if o.result:
+                if not self.parent.game_filters:
+                    self.parent.game_filters = o.get_filters()
+                    self.parent.displayed_stats = o.displayed_filters
+
+
                 self.num_players += 1
+                self.parent.all_players.extend([o])
+
                 self.ow_tree.insert('', index='end', iid=self.num_players, text="Player {}".format(self.num_players),
                                     values=(self.battle_id.get(), self.platform_chosen.get(), self.region_chosen.get()))
 
                 self.gamer_tag.delete(0, END)
                 self.platform_choices.set('Select a platform')
                 self.region_choices.set('Select a region')
+
+
+
+
             else:
                 messagebox.showinfo('Error!', 'You have entered an invalid profile!')
 
@@ -158,4 +175,183 @@ class PageThree(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        tk.Label(self, text="Input the player").grid(row=0, column=1, columnspan=2)
+        self.parent = parent
+
+        self.Label_Stats = Label(self, text='Choose at least two stats to compare')
+        self.Label_Stats.grid(row=0, column=1, columnspan = 2)
+
+        self.gameplay = StringVar()
+        self.qp_btn = Radiobutton(self, text ="Quick Play", variable = self.gameplay, value = "quickPlayStats", command = lambda: self.gameplay_chosen(), tristatevalue=0)
+        self.cp_btn = Radiobutton(self, text="Competitive", variable=self.gameplay, value="competitiveStats", command=lambda: self.gameplay_chosen(), tristatevalue=0)
+
+
+
+        self.qp_btn.grid(row = 1, column = 1)
+        self.cp_btn.grid(row = 1, column = 2)
+
+        self.scrollbar = Scrollbar(self, orient = VERTICAL)
+        self.scrollbar.grid(row=2, column=2, sticky=tk.N + tk.S)
+        self.filter_list = self.parent.displayed_stats
+
+
+
+        self.filter_lb = Listbox(self, selectmode = MULTIPLE, width = 50, yscrollcommand=self.scrollbar.set)
+        for filter in self.filter_list[1:]:
+            self.filter_lb.insert(END, filter)
+        self.filter_lb.grid(row = 2, column = 1, sticky=tk.N + tk.S + tk.E + tk.W)
+        self.filter_lb["state"] = DISABLED
+        self.filter_lb.bind("<<ListboxSelect>>", self.selected_stats)
+        self.scrollbar['command'] = self.filter_lb.yview
+
+        self.sbt_stats = Button(self, text='Submit', command=lambda: parent.change_frame(PageFour))
+        self.sbt_stats.grid(row=3, column=1)
+        self.sbt_stats["state"] = DISABLED
+
+    def selected_stats(self, lb):
+        selected_stats = lb.widget.curselection()
+        self.parent.compared_stats = ["Name"]
+        if (selected_stats != ()):
+            for stat in selected_stats:
+
+                if self.filter_list[int(stat)+1] not in self.parent.compared_stats:
+                    self.parent.compared_stats.append(self.filter_list[int(stat) + 1])
+        if len(self.parent.compared_stats) >= 2:
+            self.sbt_stats["state"] = NORMAL
+        else:
+            self.sbt_stats["state"] = DISABLED
+
+
+
+    def gameplay_chosen(self):
+        self.filter_lb["state"] = NORMAL
+        self.parent.game_mode = self.gameplay.get()
+
+
+
+class PageFour(tk.Frame):
+    """
+    The Fourth page
+    """
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+        self.parent = parent
+        self.compared_players = self.parent.all_players
+        self.compared_stats = self.parent.compared_stats
+        self.Label_table = Label(self, text='Table')
+        self.Label_table.grid(row=0, column=1, columnspan=2)
+        self.tree_stats = {}
+
+        self.sub_awards = {'Cards': 'cards', 'Medals': 'medals', 'Bronze Medals': 'medalsBronze', 'Silver Medals': 'medalsSilver',
+                 'Gold Medals': 'medalsGold'}
+        self.sub_game_results = {'Games Won':'gamesWon', 'gamesLost':'gamesLost', 'gamesPlayed':'gamesPlayed'}
+        self.in_game_stats = {'barrierDamageDone': 'barrierDamageDone', 'damageDone': 'damageDone', 'deaths': 'deaths',
+                              'eliminations': 'eliminations','soloKills': 'soloKills','objectiveKills': 'objectiveKills'}
+        self.best_game_results = {'allDamageDoneMostInGame': 'allDamageDoneMostInGame', 'barrierDamageDoneMostInGame':'barrierDamageDoneMostInGame', 'eliminationsMostInGame':'eliminationsMostInGame',
+                                  'healingDoneMostInGame':'healingDoneMostInGame', 'killsStreakBest':'killsStreakBest', 'multikillsBest':'multikillsBest'}
+        self.in_game_index = 0
+        self.best_in_game_index = 0
+        self.game_outcome_index = 0
+        self.awards_index = 0
+
+
+
+
+
+
+
+        for stat in self.parent.compared_stats:
+            self.tree_stats[stat] = []
+            self.get_player_info(stat)
+
+        self.ow_stat_tree = ttk.Treeview(self)
+        # Create the columns
+        self.ow_stat_tree['columns'] = self.tree_stats['Name']
+
+
+        self.ow_stat_tree.column("#0", width=120, minwidth=25)
+        #
+        for x, stat in enumerate(self.tree_stats['Name']):
+
+            self.ow_stat_tree.column(x, anchor=CENTER, width=100)
+
+        # Create the headings
+        self.ow_stat_tree.heading("#0", text="Player #", anchor=W)
+        for x, stat in enumerate(self.tree_stats['Name']):
+            self.ow_stat_tree.heading(x, text="Player {}".format(x+1), anchor=CENTER)
+        self.ow_stat_tree.grid(row=0, column=2, rowspan=len(self.tree_stats['Name']) + 1, padx=5, pady=5, sticky=E + W + S + N)
+
+
+
+        for x, stat in enumerate(self.tree_stats):
+            """
+            Create this in the parent class as attribute
+            """
+            if stat == 'In-Game Stats':
+                self.in_game_index = x
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat)
+            elif stat == 'Best In-Game Stats':
+                self.best_in_game_index = x
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat)
+            elif stat == 'Game Outcomes':
+                self.game_outcome_index = x
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat)
+            elif stat == 'Awards':
+                self.awards_index = x
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat)
+            elif stat in self.sub_awards:
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.move(str(x), str(self.awards_index), str(self.awards_index))
+            elif stat in self.best_game_results:
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.move(str(x), str(self.best_in_game_index), str(self.best_in_game_index))
+            elif stat in self.in_game_stats:
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.move(str(x), str(self.in_game_index), str(self.in_game_index))
+            elif stat in self.sub_game_results:
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.move(str(x), str(self.game_outcome_index), str(self.game_outcome_index))
+            else:
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+
+    # self.displayed_filters = ['Name', 'Level', 'Prestige', 'Rating', 'Endorsement Level', 'In-Game Stats',
+    #                           'Best In-Game Stats', 'Game Outcomes', 'Awards']
+    # self.api_filters.extend(
+    #     ['name', 'level', 'prestige', 'rating', 'Endorsement Level', 'In-Game Stats', 'Best In-Game Stats',
+    #      'Game Outcomes', 'Awards'])
+    def get_player_info(self, stat):
+
+        for player in self.compared_players:
+            if stat == 'Awards':
+                sub_awards = self.sub_awards
+                for sub_stat in sub_awards:
+                    if sub_stat not in self.tree_stats:
+                        self.tree_stats[sub_stat] = []
+                    self.tree_stats[sub_stat].append(player.get_stat(sub_awards[sub_stat], self.parent.game_mode))
+            elif stat == 'Game Outcomes':
+                sub_game_results = self.sub_game_results
+                for sub_stat in sub_game_results:
+                    if sub_stat not in self.tree_stats:
+                        self.tree_stats[sub_stat] = []
+                    self.tree_stats[sub_stat].append(player.get_stat(sub_game_results[sub_stat], self.parent.game_mode))
+            elif stat == 'In-Game Stats':
+                in_game_stats = self.in_game_stats
+                for sub_stat in in_game_stats:
+                    if sub_stat not in self.tree_stats:
+                        self.tree_stats[sub_stat] = []
+                    self.tree_stats[sub_stat].append(player.get_stat(in_game_stats[sub_stat], self.parent.game_mode))
+            elif stat == 'Best In-Game Stats':
+                best_game_results = self.best_game_results
+                for sub_stat in best_game_results:
+                    if sub_stat not in self.tree_stats:
+                        self.tree_stats[sub_stat] = []
+                    self.tree_stats[sub_stat].append(player.get_stat(best_game_results[sub_stat], self.parent.game_mode))
+            else:
+                self.tree_stats[stat].append(player.get_stat(stat, self.parent.game_mode))
+
+
+
+
+
+
+
