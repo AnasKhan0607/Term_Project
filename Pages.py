@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 from apicollect import Overwatch
+from PIL import Image
+from PIL import ImageTk
+import glob
 
 """
 Sources:
@@ -13,12 +16,9 @@ https://stackoverflow.com/questions/13828531/problems-in-python-getting-multiple
 """
 
 
-
-
-
-
 class PageOne(tk.Frame):
     def __init__(self, parent):
+        global img
         tk.Frame.__init__(self, parent)
 
         self.game = None
@@ -33,10 +33,18 @@ class PageOne(tk.Frame):
         self.game_choices['values'] = ['Overwatch', 'Fortnite', 'Cold War', 'WoW']
         self.game_choices.grid(row=1, column=1)
 
-
         """
         Idea: Maybe we can use validate commands for the entries
         """
+        for filename in glob.glob('yourpath/logo.png'):
+            img = ImageTk.PhotoImage(Image.open(filename).resize((475, 221)))
+            self.panel = Label(self, image=img)
+            self.panel.grid(row=0, column=1, columnspan=4)
+
+        # img = ImageTk.PhotoImage(Image.open(r"C:\Users\maste\Desktop\CCT211\Term_Project\logo.png").resize((475, 221)))
+
+        # self.panel = Label(self, image=img)
+        # self.panel.grid(row=0, column=1, columnspan=4)
 
         self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageTwo, "Hello"))
         self.sub_btn.grid(row=2, column=1)
@@ -52,8 +60,6 @@ class PageOne(tk.Frame):
             self.sub_btn["state"] = NORMAL
 
 
-
-
 class PageTwo(tk.Frame):
     """
     For Overwatch
@@ -66,7 +72,6 @@ class PageTwo(tk.Frame):
         self.num_players = 0
         self.duplicate_profile = False
         self.parent = parent
-
 
         self.ow_tree = ttk.Treeview(self)
         # Create the columns
@@ -86,7 +91,6 @@ class PageTwo(tk.Frame):
         self.platform_chosen = StringVar()
         self.region_chosen = StringVar()
         self.battle_id = StringVar()
-
 
         tk.Label(self, text="Platform:").grid(row=2, column=0, columnspan=1)
         # Create a dropdown menu
@@ -125,8 +129,6 @@ class PageTwo(tk.Frame):
         self.sub_btn.grid(row=4, column=4)
         self.sub_btn["state"] = DISABLED
 
-
-
     def validate_tag(self, id):
         if "#" or " " in id.get():
             self.battle_id.set(self.battle_id.get().replace("#", "-").replace(" ", ""))
@@ -140,7 +142,8 @@ class PageTwo(tk.Frame):
                 self.duplicate_profile = False
 
                 for registered_player in self.parent.all_players:
-                    if registered_player.information == [self.platform_chosen.get(), self.region_chosen.get(), self.battle_id.get()]:
+                    if registered_player.information == [self.platform_chosen.get(), self.region_chosen.get(),
+                                                         self.battle_id.get()]:
                         self.duplicate_profile = True
                         messagebox.showinfo('Error!', 'That profile has already been registered!')
 
@@ -153,8 +156,10 @@ class PageTwo(tk.Frame):
 
                     self.parent.all_players.extend([o])
 
-                    self.ow_tree.insert('', index='end', iid=self.num_players, text="Player {}".format(self.num_players),
-                                        values=(self.battle_id.get(), self.platform_chosen.get(), self.region_chosen.get()))
+                    self.ow_tree.insert('', index='end', iid=self.num_players,
+                                        text="Player {}".format(self.num_players),
+                                        values=(
+                                        self.battle_id.get(), self.platform_chosen.get(), self.region_chosen.get()))
 
                     self.gamer_tag.delete(0, END)
                     self.platform_choices.set('Select a platform')
@@ -166,7 +171,7 @@ class PageTwo(tk.Frame):
         except:
             messagebox.showinfo('Error!', 'You have entered an invalid profile!')
         finally:
-            if len(self.parent.all_players) >=2:
+            if len(self.parent.all_players) >= 2:
                 self.sub_btn["state"] = NORMAL
 
     def clear(self):
@@ -184,9 +189,6 @@ class PageTwo(tk.Frame):
                 selected = self.ow_tree.selection()[0]
                 self.ow_tree.delete(selected)
 
-
-
-
         # for player in t:
         #     self.ow_tree.delete(player)
         #     print(int(player))
@@ -203,27 +205,25 @@ class PageThree(tk.Frame):
         self.parent = parent
 
         self.Label_Stats = Label(self, text='Choose at least two stats to compare')
-        self.Label_Stats.grid(row=0, column=1, columnspan = 2)
+        self.Label_Stats.grid(row=0, column=1, columnspan=2)
 
         self.gameplay = StringVar()
-        self.qp_btn = Radiobutton(self, text ="Quick Play", variable = self.gameplay, value = "quickPlayStats", command = lambda: self.gameplay_chosen(), tristatevalue=0)
-        self.cp_btn = Radiobutton(self, text="Competitive", variable=self.gameplay, value="competitiveStats", command=lambda: self.gameplay_chosen(), tristatevalue=0)
+        self.qp_btn = Radiobutton(self, text="Quick Play", variable=self.gameplay, value="quickPlayStats",
+                                  command=lambda: self.gameplay_chosen(), tristatevalue=0)
+        self.cp_btn = Radiobutton(self, text="Competitive", variable=self.gameplay, value="competitiveStats",
+                                  command=lambda: self.gameplay_chosen(), tristatevalue=0)
 
+        self.qp_btn.grid(row=1, column=1)
+        self.cp_btn.grid(row=1, column=2)
 
-
-        self.qp_btn.grid(row = 1, column = 1)
-        self.cp_btn.grid(row = 1, column = 2)
-
-        self.scrollbar = Scrollbar(self, orient = VERTICAL)
+        self.scrollbar = Scrollbar(self, orient=VERTICAL)
         self.scrollbar.grid(row=2, column=2, sticky=tk.N + tk.S)
         self.filter_list = self.parent.displayed_stats
 
-
-
-        self.filter_lb = Listbox(self, selectmode = MULTIPLE, width = 50, yscrollcommand=self.scrollbar.set)
+        self.filter_lb = Listbox(self, selectmode=MULTIPLE, width=50, yscrollcommand=self.scrollbar.set)
         for filter in self.filter_list[1:]:
             self.filter_lb.insert(END, filter)
-        self.filter_lb.grid(row = 2, column = 1, sticky=tk.N + tk.S + tk.E + tk.W)
+        self.filter_lb.grid(row=2, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
         self.filter_lb["state"] = DISABLED
         self.filter_lb.bind("<<ListboxSelect>>", self.selected_stats)
         self.scrollbar['command'] = self.filter_lb.yview
@@ -241,7 +241,7 @@ class PageThree(tk.Frame):
         if (selected_stats != ()):
             for stat in selected_stats:
 
-                if self.filter_list[int(stat)+1] not in self.parent.compared_stats:
+                if self.filter_list[int(stat) + 1] not in self.parent.compared_stats:
                     self.parent.compared_stats.append(self.filter_list[int(stat) + 1])
         if len(self.parent.compared_stats) >= 2:
             self.sbt_stats["state"] = NORMAL
@@ -252,12 +252,9 @@ class PageThree(tk.Frame):
         self.parent.all_players.clear()
         self.parent.change_frame(PageTwo)
 
-
-
     def gameplay_chosen(self):
         self.filter_lb["state"] = NORMAL
         self.parent.game_mode = self.gameplay.get()
-
 
 
 class PageFour(tk.Frame):
@@ -274,13 +271,18 @@ class PageFour(tk.Frame):
         self.Label_table.grid(row=0, column=1, columnspan=2)
         self.tree_stats = {}
 
-        self.sub_awards = {'Cards': 'cards', 'Medals': 'medals', 'Bronze Medals': 'medalsBronze', 'Silver Medals': 'medalsSilver',
-                 'Gold Medals': 'medalsGold'}
-        self.sub_game_results = {'Games Won':'gamesWon', 'gamesLost':'gamesLost', 'gamesPlayed':'gamesPlayed'}
+        self.sub_awards = {'Cards': 'cards', 'Medals': 'medals', 'Bronze Medals': 'medalsBronze',
+                           'Silver Medals': 'medalsSilver',
+                           'Gold Medals': 'medalsGold'}
+        self.sub_game_results = {'Games Won': 'gamesWon', 'gamesLost': 'gamesLost', 'gamesPlayed': 'gamesPlayed'}
         self.in_game_stats = {'barrierDamageDone': 'barrierDamageDone', 'damageDone': 'damageDone', 'deaths': 'deaths',
-                              'eliminations': 'eliminations','soloKills': 'soloKills','objectiveKills': 'objectiveKills'}
-        self.best_game_results = {'allDamageDoneMostInGame': 'allDamageDoneMostInGame', 'barrierDamageDoneMostInGame':'barrierDamageDoneMostInGame', 'eliminationsMostInGame':'eliminationsMostInGame',
-                                  'healingDoneMostInGame':'healingDoneMostInGame', 'killsStreakBest':'killsStreakBest', 'multikillsBest':'multikillsBest'}
+                              'eliminations': 'eliminations', 'soloKills': 'soloKills',
+                              'objectiveKills': 'objectiveKills'}
+        self.best_game_results = {'allDamageDoneMostInGame': 'allDamageDoneMostInGame',
+                                  'barrierDamageDoneMostInGame': 'barrierDamageDoneMostInGame',
+                                  'eliminationsMostInGame': 'eliminationsMostInGame',
+                                  'healingDoneMostInGame': 'healingDoneMostInGame',
+                                  'killsStreakBest': 'killsStreakBest', 'multikillsBest': 'multikillsBest'}
         self.in_game_index = 0
         self.best_in_game_index = 0
         self.game_outcome_index = 0
@@ -289,15 +291,8 @@ class PageFour(tk.Frame):
         self.change_btn = Button(self, text='Change Filters', command=lambda: parent.change_frame(PageThree))
         self.change_btn.grid(row=5, column=1, columnspan=2)
 
-
         self.back_btn = Button(self, text='New Comparision', command=self.transfer_second_page)
-        self.back_btn.grid(row = 4, column = 1, columnspan=2)
-
-
-
-
-
-
+        self.back_btn.grid(row=4, column=1, columnspan=2)
 
         for stat in self.parent.compared_stats:
             self.tree_stats[stat] = []
@@ -307,20 +302,17 @@ class PageFour(tk.Frame):
         # Create the columns
         self.ow_stat_tree['columns'] = self.tree_stats['Name']
 
-
         self.ow_stat_tree.column("#0", width=120, minwidth=25)
         #
         for x, stat in enumerate(self.tree_stats['Name']):
-
             self.ow_stat_tree.column(x, anchor=CENTER, width=100)
 
         # Create the headings
         self.ow_stat_tree.heading("#0", text="Player #", anchor=W)
         for x, stat in enumerate(self.tree_stats['Name']):
-            self.ow_stat_tree.heading(x, text="Player {}".format(x+1), anchor=CENTER)
-        self.ow_stat_tree.grid(row=0, column=2, rowspan=len(self.tree_stats['Name']) + 1, padx=5, pady=5, sticky=E + W + S + N)
-
-
+            self.ow_stat_tree.heading(x, text="Player {}".format(x + 1), anchor=CENTER)
+        self.ow_stat_tree.grid(row=0, column=2, rowspan=len(self.tree_stats['Name']) + 1, padx=5, pady=5,
+                               sticky=E + W + S + N)
 
         for x, stat in enumerate(self.tree_stats):
             """
@@ -339,19 +331,19 @@ class PageFour(tk.Frame):
                 self.awards_index = x
                 self.ow_stat_tree.insert('', index='end', iid=x, text=stat)
             elif stat in self.sub_awards:
-                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values=self.tree_stats[stat])
                 self.ow_stat_tree.move(str(x), str(self.awards_index), str(self.awards_index))
             elif stat in self.best_game_results:
-                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values=self.tree_stats[stat])
                 self.ow_stat_tree.move(str(x), str(self.best_in_game_index), str(self.best_in_game_index))
             elif stat in self.in_game_stats:
-                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values=self.tree_stats[stat])
                 self.ow_stat_tree.move(str(x), str(self.in_game_index), str(self.in_game_index))
             elif stat in self.sub_game_results:
-                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values=self.tree_stats[stat])
                 self.ow_stat_tree.move(str(x), str(self.game_outcome_index), str(self.game_outcome_index))
             else:
-                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values = self.tree_stats[stat])
+                self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values=self.tree_stats[stat])
 
     # self.displayed_filters = ['Name', 'Level', 'Prestige', 'Rating', 'Endorsement Level', 'In-Game Stats',
     #                           'Best In-Game Stats', 'Game Outcomes', 'Awards']
@@ -395,13 +387,7 @@ class PageFour(tk.Frame):
                 for sub_stat in best_game_results:
                     if sub_stat not in self.tree_stats:
                         self.tree_stats[sub_stat] = []
-                    self.tree_stats[sub_stat].append(player.get_stat(best_game_results[sub_stat], self.parent.game_mode))
+                    self.tree_stats[sub_stat].append(
+                        player.get_stat(best_game_results[sub_stat], self.parent.game_mode))
             else:
                 self.tree_stats[stat].append(player.get_stat(stat, self.parent.game_mode))
-
-
-
-
-
-
-

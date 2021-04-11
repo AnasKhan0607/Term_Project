@@ -1,4 +1,5 @@
 import requests
+
 # API address we can fill the parameters: platform, region and battle tag of a player to get their profile
 url = 'https://ow-api.com/v1/stats/{}/{}/{}/complete'
 
@@ -15,7 +16,6 @@ class Overwatch:
         self.api_filters = []
         self.sub_stats = []
 
-
     def get_filters(self):
         """
         Get the main filters(stats) available for a user to select to compare with another player.
@@ -25,11 +25,13 @@ class Overwatch:
         """
 
         # The primary filters
-        self.displayed_filters = ['Name', 'Level', 'Prestige', 'Rating', 'Endorsement Level', 'In-Game Stats', 'Best In-Game Stats', 'Game Outcomes', 'Awards']
-        self.api_filters.extend(['name', 'level', 'prestige', 'rating','Endorsement Level', 'In-Game Stats', 'Best In-Game Stats', 'Game Outcomes', 'Awards'])
+        self.displayed_filters = ['Name', 'Level', 'Prestige', 'Rating', 'Endorsement Level', 'In-Game Stats',
+                                  'Best In-Game Stats', 'Game Outcomes', 'Awards']
+        self.api_filters.extend(
+            ['name', 'level', 'prestige', 'rating', 'Endorsement Level', 'In-Game Stats', 'Best In-Game Stats',
+             'Game Outcomes', 'Awards'])
 
         filter_dict = {}
-
 
         for x, stat in enumerate(self.displayed_filters):
             filter_dict[stat] = self.api_filters[x]
@@ -71,13 +73,14 @@ class Overwatch:
                 return self.result_json['rating']
             elif stat == 'Prestige':
                 return self.result_json['prestige']
-            elif stat in ['cards', 'medals', 'medalsBronze', 'medalsSilver','medalsGold']:
+            elif stat in ['cards', 'medals', 'medalsBronze', 'medalsSilver', 'medalsGold']:
                 return self.result_json[game_mode]['awards'][stat]
             elif stat in ['gameWon', 'gamesLost', 'gamesPlayed']:
                 return self.result_json[game_mode]['careerStats']['allHeroes']['game'][stat]
-            elif stat in ['allDamageDoneMostInGame', 'barrierDamageDoneMostInGame', 'eliminationsMostInGame', 'healingDoneMostInGame', 'killsStreakBest', 'multikillsBest']:
+            elif stat in ['allDamageDoneMostInGame', 'barrierDamageDoneMostInGame', 'eliminationsMostInGame',
+                          'healingDoneMostInGame', 'killsStreakBest', 'multikillsBest']:
                 return self.result_json[game_mode]['careerStats']['allHeroes']['best'][stat]
-            elif stat in ['barrierDamageDone', 'damageDone', 'deaths','eliminations','soloKills','objectiveKills']:
+            elif stat in ['barrierDamageDone', 'damageDone', 'deaths', 'eliminations', 'soloKills', 'objectiveKills']:
                 return self.result_json[game_mode]['careerStats']['allHeroes']['combat'][stat]
             else:
                 return self.result_json[stat]
@@ -87,22 +90,18 @@ class Overwatch:
         except KeyError:
             return 'N/A'
 
-
-
-
-
     # def analyze_stats(self, player):
-        # """
-        # analyze the stats of a player and return an integer value representing its final
-        # score after evaluation
-        #
-        # :param player: Battle Tag of player
-        # :return: evaluation score
-        # """
-        # if player == self.test_get_player_info()[0]:
-        #     player_stats = self.test_get_player_info()
-        #     return 0.6 * player_stats[1] + 0.8 * player_stats[2] + 0.8 * player_stats[3]  # example calculations
-        # return "Invalid player"
+    # """
+    # analyze the stats of a player and return an integer value representing its final
+    # score after evaluation
+    #
+    # :param player: Battle Tag of player
+    # :return: evaluation score
+    # """
+    # if player == self.test_get_player_info()[0]:
+    #     player_stats = self.test_get_player_info()
+    #     return 0.6 * player_stats[1] + 0.8 * player_stats[2] + 0.8 * player_stats[3]  # example calculations
+    # return "Invalid player"
 
     # def compare_2players(self, player1, player2):
     #     """
@@ -118,9 +117,8 @@ class Overwatch:
     #         return player2
     #     return "Players are equal in comparison"
 
+
 # Example of a user who uses platform is pc, region us, and battle tag of player of cats-11481 in Overwatch
 
 
 ov = Overwatch('pc', 'us', 'cats-11481')
-
-
