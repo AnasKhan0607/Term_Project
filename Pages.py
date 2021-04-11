@@ -36,8 +36,8 @@ class PageOne(tk.Frame):
         """
         Idea: Maybe we can use validate commands for the entries
         """
-        for filename in glob.glob('yourpath/logo.png'):
-            img = ImageTk.PhotoImage(Image.open(filename).resize((475, 221)))
+        for filename in glob.glob('logo.png'):
+            img = ImageTk.PhotoImage(Image.open(filename).resize((380, 221)))
             self.panel = Label(self, image=img)
             self.panel.grid(row=0, column=1, columnspan=4)
 
