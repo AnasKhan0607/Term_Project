@@ -232,6 +232,9 @@ class PageThree(tk.Frame):
         self.sbt_stats.grid(row=3, column=1)
         self.sbt_stats["state"] = DISABLED
 
+        self.back_btn = Button(self, text='Go back', command=self.transfer_second_page)
+        self.back_btn.grid(row=3, column=2)
+
     def selected_stats(self, lb):
         selected_stats = lb.widget.curselection()
         self.parent.compared_stats = ["Name"]
@@ -244,6 +247,10 @@ class PageThree(tk.Frame):
             self.sbt_stats["state"] = NORMAL
         else:
             self.sbt_stats["state"] = DISABLED
+
+    def transfer_second_page(self):
+        self.parent.all_players.clear()
+        self.parent.change_frame(PageTwo)
 
 
 
@@ -278,6 +285,13 @@ class PageFour(tk.Frame):
         self.best_in_game_index = 0
         self.game_outcome_index = 0
         self.awards_index = 0
+
+        self.change_btn = Button(self, text='Change Filters', command=lambda: parent.change_frame(PageThree))
+        self.change_btn.grid(row=5, column=1, columnspan=2)
+
+
+        self.back_btn = Button(self, text='New Comparision', command=self.transfer_second_page)
+        self.back_btn.grid(row = 4, column = 1, columnspan=2)
 
 
 
@@ -344,6 +358,17 @@ class PageFour(tk.Frame):
     # self.api_filters.extend(
     #     ['name', 'level', 'prestige', 'rating', 'Endorsement Level', 'In-Game Stats', 'Best In-Game Stats',
     #      'Game Outcomes', 'Awards'])
+
+    def transfer_second_page(self):
+        self.parent.all_players.clear()
+        self.parent.game_filters = {}
+        self.parent.displayed_stats.clear()
+        self.parent.compared_stats.clear()
+        self.parent.game_mode = None
+        self.compared_players.clear()
+        self.compared_stats.clear()
+        self.parent.change_frame(PageTwo)
+
     def get_player_info(self, stat):
 
         for player in self.compared_players:
