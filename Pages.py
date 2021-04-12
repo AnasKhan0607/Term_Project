@@ -132,7 +132,12 @@ class PageTwo(tk.Frame):
         self.sub_btn.grid(row=4, column=4)
         self.sub_btn["state"] = DISABLED
 
-        tk.Label(self, text="Sample input to compare:\nPlatform: pc \nRegion: us \nID: OmniOptic-1773",
+        tk.Label(self, text="Default profiles to test with:\n"
+                            "(pc, us, cats-11481)\n"
+                            "(pc, us, GamersCCCP-1569)\n"
+                            "(pc, us, Morgan#22492)\n"
+                            "(pc, us, justin#2882)\n"
+                            "(pc, us, Justin-23138)",
                  anchor="w", width=30, justify=LEFT).grid(row=5, column=2, columnspan=1)
         tk.Label(self, text="How to use: \nSelect a platform and region, \nthen type in the BattleTag of the player."
                             "\nMore than 2 players are allowed.",
