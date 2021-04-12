@@ -17,6 +17,9 @@ https://stackoverflow.com/questions/13828531/problems-in-python-getting-multiple
 
 
 class PageOne(tk.Frame):
+    """
+    The introduction page to the GUI
+    """
     def __init__(self, parent):
         global img
         tk.Frame.__init__(self, parent)
@@ -29,22 +32,17 @@ class PageOne(tk.Frame):
         self.game_choices = ttk.Combobox(self, state="readonly", textvariable=self.game_chosen, width=30)
         # Default text shown
         self.game_choices.set("Select a game")
-        # Possible games to choose from: Cold war and WoW are examples for now
-        self.game_choices['values'] = ['Overwatch', 'Fortnite', 'Cold War', 'WoW']
+        # Possible games to choose from: We used Overwatch
+        self.game_choices['values'] = ['Overwatch']
         self.game_choices.grid(row=1, column=1)
 
         """
-        Idea: Maybe we can use validate commands for the entries
+        To use the logo image on the front page
         """
         for filename in glob.glob('logo.png'):
             img = ImageTk.PhotoImage(Image.open(filename).resize((380, 221)))
             self.panel = Label(self, image=img)
             self.panel.grid(row=0, column=1, columnspan=4)
-
-        # img = ImageTk.PhotoImage(Image.open(r"C:\Users\maste\Desktop\CCT211\Term_Project\logo.png").resize((475, 221)))
-
-        # self.panel = Label(self, image=img)
-        # self.panel.grid(row=0, column=1, columnspan=4)
 
         self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageTwo, "Hello"))
         self.sub_btn.grid(row=2, column=1)
@@ -55,6 +53,9 @@ class PageOne(tk.Frame):
         self.game_choices.bind("<<ComboboxSelected>>", self.callback)
 
     def callback(self, event_object):
+        """
+        To ensure a game is selected to enable the submit button
+        """
         self.game = event_object.widget.get()
         if self.game != "Select a game":
             self.sub_btn["state"] = NORMAL
@@ -62,7 +63,7 @@ class PageOne(tk.Frame):
 
 class PageTwo(tk.Frame):
     """
-    For Overwatch
+    The second page for accepting player to compare stats with.
     """
 
     def __init__(self, parent):
@@ -135,14 +136,19 @@ class PageTwo(tk.Frame):
                             "\nMore than 2 players are allowed.",
                  anchor="e", width = 30, justify=LEFT).grid(row=5, column=1, columnspan=1)
 
-
-
-    def validate_tag(self, id):
-        if "#" or " " in id.get():
+    def validate_tag(self, check_id):
+        """
+        Battle tags used in the API request must not contain spaces or #'s (-'s are used to replace them).
+        """
+        if "#" or " " in check_id.get():
             self.battle_id.set(self.battle_id.get().replace("#", "-").replace(" ", ""))
 
     def add_player(self):
-
+        """
+        Validates a player in the API, and adds it to the list of all players who have been registered.
+        If the player is not found in the API it is not valid, and error messages are used to inform users
+        about this. There must be at least two players registered to submit.
+        """
         try:
             o = Overwatch(self.platform_chosen.get(), self.region_chosen.get(), self.battle_id.get())
 
@@ -183,29 +189,30 @@ class PageTwo(tk.Frame):
                 self.sub_btn["state"] = NORMAL
 
     def clear(self):
+        """
+        Clears all the players registered in the treeview
+        """
         for player in self.ow_tree.get_children():
             self.ow_tree.delete(player)
             self.parent.all_players.clear()
             self.sub_btn["state"] = DISABLED
 
     def remove_players(self):
-        curItem = self.ow_tree.focus()
-        deleted_player = self.ow_tree.item(curItem)['values']
+        """
+        Remove selected players registered in the treeview
+        """
+        cur_item = self.ow_tree.focus()
+        deleted_player = self.ow_tree.item(cur_item)['values']
         for player in self.parent.all_players:
             if set(player.information) == set(deleted_player):
                 self.parent.all_players.remove(player)
                 selected = self.ow_tree.selection()[0]
                 self.ow_tree.delete(selected)
 
-        # for player in t:
-        #     self.ow_tree.delete(player)
-        #     print(int(player))
-        #     del self.parent.all_players[int(player) - 1]
-
 
 class PageThree(tk.Frame):
     """
-    The Third page
+    The Third page for looking at the potential filters to compare the selected players with from page two.
     """
 
     def __init__(self, parent):
@@ -229,8 +236,8 @@ class PageThree(tk.Frame):
         self.filter_list = self.parent.displayed_stats
 
         self.filter_lb = Listbox(self, selectmode=MULTIPLE, width=50, yscrollcommand=self.scrollbar.set)
-        for filter in self.filter_list[1:]:
-            self.filter_lb.insert(END, filter)
+        for new_filter in self.filter_list[1:]:
+            self.filter_lb.insert(END, new_filter)
         self.filter_lb.grid(row=2, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
         self.filter_lb["state"] = DISABLED
         self.filter_lb.bind("<<ListboxSelect>>", self.selected_stats)
@@ -244,11 +251,14 @@ class PageThree(tk.Frame):
         self.back_btn.grid(row=3, column=2)
 
     def selected_stats(self, lb):
+        """
+        To retrieve selected stats from the listbox the player can select filters from. At least one filter must be
+        selected, not included the default name to proceed. Resource to help us with this feature was listed in sources.
+        """
         selected_stats = lb.widget.curselection()
         self.parent.compared_stats = ["Name"]
         if (selected_stats != ()):
             for stat in selected_stats:
-
                 if self.filter_list[int(stat) + 1] not in self.parent.compared_stats:
                     self.parent.compared_stats.append(self.filter_list[int(stat) + 1])
         if len(self.parent.compared_stats) >= 2:
@@ -267,7 +277,7 @@ class PageThree(tk.Frame):
 
 class PageFour(tk.Frame):
     """
-    The Fourth page
+    The fourth page used to display the players in a treeview to
     """
 
     def __init__(self, parent):
@@ -278,19 +288,19 @@ class PageFour(tk.Frame):
         self.Label_table = Label(self, text='Table')
         self.Label_table.grid(row=0, column=1, columnspan=2)
         self.tree_stats = {}
-
+        # Needed to organize the filters
         self.sub_awards = {'Cards': 'cards', 'Medals': 'medals', 'Bronze Medals': 'medalsBronze',
                            'Silver Medals': 'medalsSilver',
                            'Gold Medals': 'medalsGold'}
-        self.sub_game_results = {'Games Won': 'gamesWon', 'gamesLost': 'gamesLost', 'gamesPlayed': 'gamesPlayed'}
-        self.in_game_stats = {'barrierDamageDone': 'barrierDamageDone', 'damageDone': 'damageDone', 'deaths': 'deaths',
-                              'eliminations': 'eliminations', 'soloKills': 'soloKills',
-                              'objectiveKills': 'objectiveKills'}
-        self.best_game_results = {'allDamageDoneMostInGame': 'allDamageDoneMostInGame',
-                                  'barrierDamageDoneMostInGame': 'barrierDamageDoneMostInGame',
-                                  'eliminationsMostInGame': 'eliminationsMostInGame',
-                                  'healingDoneMostInGame': 'healingDoneMostInGame',
-                                  'killsStreakBest': 'killsStreakBest', 'multikillsBest': 'multikillsBest'}
+        self.sub_game_results = {'Games Won': 'gamesWon', 'GamesLost': 'gamesLost', 'Games Played': 'gamesPlayed'}
+        self.in_game_stats = {'Barrier DamageDone': 'barrierDamageDone', 'Damage Done': 'damageDone', 'Deaths': 'deaths',
+                              'Eliminations': 'eliminations', 'Solo Kills': 'soloKills',
+                              'Objective Kills': 'objectiveKills'}
+        self.best_game_results = {'All Damage Done Most In Game': 'allDamageDoneMostInGame',
+                                  'Barrier Damage Done Most In Game': 'barrierDamageDoneMostInGame',
+                                  'Eliminations Most In Game': 'eliminationsMostInGame',
+                                  'Healing Done Most In Game': 'healingDoneMostInGame',
+                                  'Kills Streak Best': 'killsStreakBest', 'Multi kills Best': 'multikillsBest'}
         self.in_game_index = 0
         self.best_in_game_index = 0
         self.game_outcome_index = 0
@@ -353,13 +363,11 @@ class PageFour(tk.Frame):
             else:
                 self.ow_stat_tree.insert('', index='end', iid=x, text=stat, values=self.tree_stats[stat])
 
-    # self.displayed_filters = ['Name', 'Level', 'Prestige', 'Rating', 'Endorsement Level', 'In-Game Stats',
-    #                           'Best In-Game Stats', 'Game Outcomes', 'Awards']
-    # self.api_filters.extend(
-    #     ['name', 'level', 'prestige', 'rating', 'Endorsement Level', 'In-Game Stats', 'Best In-Game Stats',
-    #      'Game Outcomes', 'Awards'])
-
     def transfer_second_page(self):
+        """
+        To revisit the second page from the third page, clearing information about the filters that could
+        have been selected
+        """
         self.parent.all_players.clear()
         self.parent.game_filters = {}
         self.parent.displayed_stats.clear()
@@ -370,7 +378,9 @@ class PageFour(tk.Frame):
         self.parent.change_frame(PageTwo)
 
     def get_player_info(self, stat):
-
+        """
+        Organizes the information for each player for each particular filter to access it later on.
+        """
         for player in self.compared_players:
             if stat == 'Awards':
                 sub_awards = self.sub_awards

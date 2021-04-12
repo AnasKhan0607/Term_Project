@@ -24,6 +24,9 @@ class FirstGUI(tk.Tk):
         self.game_mode = None
 
     def change_frame(self, change_frame, *player_info):
+        """
+        Needed to handle frame changes so that the user can move from one window to the other
+        """
         new_frame = change_frame(self)
         if self._frame is not None:
             self._frame.destroy()
@@ -32,5 +35,8 @@ class FirstGUI(tk.Tk):
 
 
 if __name__ == "__main__":
+    """
+    Runs the application
+    """
     app = FirstGUI()
     app.mainloop()
