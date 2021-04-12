@@ -1,4 +1,5 @@
 import requests
+
 """
 Required installments: requests
 """
@@ -12,6 +13,7 @@ class Overwatch:
     It sends requests to the Overwatch API online to fetch stats of players in the game.
     To fetch the results the user needs to input a valid platform, region and battle tag of their account.
     """
+
     def __init__(self, platform, region, battle_tag):
         self.information = [platform, region, battle_tag]
         # Send a request to the api to get information about the user profile
@@ -69,9 +71,10 @@ class Overwatch:
             elif find_filter in ['gameWon', 'gamesLost', 'gamesPlayed']:
                 return self.result_json[game_mode]['careerStats']['allHeroes']['game'][find_filter]
             elif find_filter in ['allDamageDoneMostInGame', 'barrierDamageDoneMostInGame', 'eliminationsMostInGame',
-                          'healingDoneMostInGame', 'killsStreakBest', 'multikillsBest']:
+                                 'healingDoneMostInGame', 'killsStreakBest', 'multikillsBest']:
                 return self.result_json[game_mode]['careerStats']['allHeroes']['best'][find_filter]
-            elif find_filter in ['barrierDamageDone', 'damageDone', 'deaths', 'eliminations', 'soloKills', 'objectiveKills']:
+            elif find_filter in ['barrierDamageDone', 'damageDone', 'deaths', 'eliminations', 'soloKills',
+                                 'objectiveKills']:
                 return self.result_json[game_mode]['careerStats']['allHeroes']['combat'][find_filter]
             else:
                 return self.result_json[find_filter]

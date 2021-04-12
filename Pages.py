@@ -20,6 +20,7 @@ class PageOne(tk.Frame):
     """
     The introduction page to the GUI
     """
+
     def __init__(self, parent):
         global img
         tk.Frame.__init__(self, parent)
@@ -118,23 +119,24 @@ class PageTwo(tk.Frame):
 
         self.gamer_tag.grid(row=4, column=1)
 
-        self.add_btn = Button(self, text='Add Player', command=self.add_player, height = 1, width = 20)
+        self.add_btn = Button(self, text='Add Player', command=self.add_player, height=1, width=20)
         self.add_btn.grid(row=0, column=4)
-        self.add_btn = Button(self, text='Remove Player(s)', command=self.remove_players, height = 1, width = 20)
+        self.add_btn = Button(self, text='Remove Player(s)', command=self.remove_players, height=1, width=20)
 
         self.add_btn.grid(row=1, padx=5, column=4)
-        self.add_btn = Button(self, text='Clear', command=self.clear, height = 1, width = 20)
+        self.add_btn = Button(self, text='Clear', command=self.clear, height=1, width=20)
         self.add_btn.grid(row=2, column=4)
-        self.back_btn = Button(self, text='Go back', command=lambda: parent.change_frame(PageOne), height = 1, width = 20).grid(row=3, column=4)
-        self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageThree), height = 1, width = 20)
+        self.back_btn = Button(self, text='Go back', command=lambda: parent.change_frame(PageOne), height=1,
+                               width=20).grid(row=3, column=4)
+        self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageThree), height=1, width=20)
         self.sub_btn.grid(row=4, column=4)
         self.sub_btn["state"] = DISABLED
 
         tk.Label(self, text="Sample input to compare:\nPlatform: pc \nRegion: us \nID: OmniOptic-1773",
-                 anchor="w", width = 30, justify=LEFT).grid(row=5, column=2, columnspan = 1)
+                 anchor="w", width=30, justify=LEFT).grid(row=5, column=2, columnspan=1)
         tk.Label(self, text="How to use: \nSelect a platform and region, \nthen type in the BattleTag of the player."
                             "\nMore than 2 players are allowed.",
-                 anchor="e", width = 30, justify=LEFT).grid(row=5, column=1, columnspan=1)
+                 anchor="e", width=30, justify=LEFT).grid(row=5, column=1, columnspan=1)
 
     def validate_tag(self, check_id):
         """
@@ -173,7 +175,7 @@ class PageTwo(tk.Frame):
                     self.ow_tree.insert('', index='end', iid=self.num_players,
                                         text="Player {}".format(self.num_players),
                                         values=(
-                                        self.battle_id.get(), self.platform_chosen.get(), self.region_chosen.get()))
+                                            self.battle_id.get(), self.platform_chosen.get(), self.region_chosen.get()))
 
                     self.gamer_tag.delete(0, END)
                     self.platform_choices.set('Select a platform')
@@ -257,7 +259,7 @@ class PageThree(tk.Frame):
         """
         selected_stats = lb.widget.curselection()
         self.parent.compared_stats = ["Name"]
-        if (selected_stats != ()):
+        if selected_stats != ():
             for stat in selected_stats:
                 if self.filter_list[int(stat) + 1] not in self.parent.compared_stats:
                     self.parent.compared_stats.append(self.filter_list[int(stat) + 1])
@@ -293,7 +295,8 @@ class PageFour(tk.Frame):
                            'Silver Medals': 'medalsSilver',
                            'Gold Medals': 'medalsGold'}
         self.sub_game_results = {'Games Won': 'gamesWon', 'GamesLost': 'gamesLost', 'Games Played': 'gamesPlayed'}
-        self.in_game_stats = {'Barrier DamageDone': 'barrierDamageDone', 'Damage Done': 'damageDone', 'Deaths': 'deaths',
+        self.in_game_stats = {'Barrier DamageDone': 'barrierDamageDone', 'Damage Done': 'damageDone',
+                              'Deaths': 'deaths',
                               'Eliminations': 'eliminations', 'Solo Kills': 'soloKills',
                               'Objective Kills': 'objectiveKills'}
         self.best_game_results = {'All Damage Done Most In Game': 'allDamageDoneMostInGame',
