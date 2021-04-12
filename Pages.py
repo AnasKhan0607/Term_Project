@@ -86,7 +86,7 @@ class PageTwo(tk.Frame):
         self.ow_tree.heading("Platform", text="Platform", anchor=W)
         self.ow_tree.heading("Region", text="Region", anchor=CENTER)
 
-        self.ow_tree.grid(row=0, column=2, rowspan=5, padx=5, pady=5, sticky=E + W + S + N)
+        self.ow_tree.grid(row=0, column=2, rowspan=5, padx=5, pady=20, sticky=E + W + S + N)
 
         self.platform_chosen = StringVar()
         self.region_chosen = StringVar()
@@ -113,21 +113,29 @@ class PageTwo(tk.Frame):
         tk.Label(self, text="Battle Tag:").grid(row=4, column=0, columnspan=1)
 
         self.battle_id.trace("w", lambda name, index, mode, new_id=self.battle_id: self.validate_tag(new_id))
-        self.gamer_tag = Entry(self, textvariable=self.battle_id)
+        self.gamer_tag = Entry(self, textvariable=self.battle_id, width=33)
 
         self.gamer_tag.grid(row=4, column=1)
 
-        self.add_btn = Button(self, text='Add Player', command=self.add_player)
+        self.add_btn = Button(self, text='Add Player', command=self.add_player, height = 1, width = 20)
         self.add_btn.grid(row=0, column=4)
-        self.add_btn = Button(self, text='Remove Player(s)', command=self.remove_players)
+        self.add_btn = Button(self, text='Remove Player(s)', command=self.remove_players, height = 1, width = 20)
 
         self.add_btn.grid(row=1, padx=5, column=4)
-        self.add_btn = Button(self, text='Clear', command=self.clear)
+        self.add_btn = Button(self, text='Clear', command=self.clear, height = 1, width = 20)
         self.add_btn.grid(row=2, column=4)
-        self.back_btn = Button(self, text='Go back', command=lambda: parent.change_frame(PageOne)).grid(row=3, column=4)
-        self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageThree))
+        self.back_btn = Button(self, text='Go back', command=lambda: parent.change_frame(PageOne), height = 1, width = 20).grid(row=3, column=4)
+        self.sub_btn = Button(self, text='Submit', command=lambda: parent.change_frame(PageThree), height = 1, width = 20)
         self.sub_btn.grid(row=4, column=4)
         self.sub_btn["state"] = DISABLED
+
+        tk.Label(self, text="Sample input to compare:\nPlatform: pc \nRegion: us \nID: OmniOptic-1773",
+                 anchor="w", width = 30, justify=LEFT).grid(row=5, column=2, columnspan = 1)
+        tk.Label(self, text="How to use: \nSelect a platform and region, \nthen type in the BattleTag of the player."
+                            "\nMore than 2 players are allowed.",
+                 anchor="e", width = 30, justify=LEFT).grid(row=5, column=1, columnspan=1)
+
+
 
     def validate_tag(self, id):
         if "#" or " " in id.get():
