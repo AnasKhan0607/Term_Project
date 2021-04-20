@@ -1,79 +1,42 @@
 from tkinter import *
 from tkinter import ttk
+import tkinter as tk
+from Pages import PageOne
 from apicollect import Overwatch
 
-class FirstGUI:
+
+class FirstGUI(tk.Tk):
     """
     This is pertaining to Overwatch only, Remember that in the apicollect.py file,
     Overwatch API requires you to put in platform, region and battle id of the player.
     """
-    def __init__(self, parent):
-        self.parent = parent
-        self.game = None
 
-        self.frame = Frame(self.parent)
-        self.labelSelect = Label(self.frame, text='Choose a game to find stats to compare between multiple players')
-        self.labelSelect.grid(row=0, column=1)
-        self.game_chosen = StringVar()
-        # Create a dropdown menu
-        self.game_choices = ttk.Combobox(self.frame, state="readonly", textvariable=self.game_chosen, width=30)
-        # Default text shown
-        self.game_choices.set("Select a game")
-        # Possible games to choose from: Cold war and WoW are examples for now
-        self.game_choices['values'] = ['Overwatch', 'Fortnite', 'Cold War', 'WoW']
-        self.game_choices.grid(row=1, column=1)
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self.geometry("720x360")
+        self.title("Statistical Tracker for:")
+        self._frame = None
+        self.change_frame(PageOne)
+        self.all_players = []
+        self.game_filters = {}
+        self.displayed_stats = []
+        self.compared_stats = []
+        self.game_mode = None
 
+    def change_frame(self, change_frame, *player_info):
         """
-        Idea: Maybe we can use validate commands for the entries
+        Needed to handle frame changes so that the user can move from one window to the other
         """
-        # Entry for user to put in platform
-        platform_id = StringVar()
-        self.first_gamer_plat = Entry(self.frame, textvariable=platform_id)
-        self.first_gamer_plat.grid(row=2, column=1)
-
-        # Entry for user to put in region
-        region_id = StringVar()
-        self.first_gamer_reg= Entry(self.frame, textvariable=region_id)
-        self.first_gamer_reg.grid(row=3, column=1)
-
-        # Entry for user to put in battle_id
-        battle_id = StringVar()
-        self.first_gamer_batt = Entry(self.frame, textvariable=battle_id)
-        self.first_gamer_batt.grid(row=4, column=1)
-
-        # Submit Button
-        self.sub_btn = Button(self.frame, text='Submit', command=self.submit)
-        self.sub_btn.grid(row=5, column=3)
-
-        self.frame.pack()
-        # If a game option is selected call the callbackf function
-        self.game_choices.bind("<<ComboboxSelected>>", self.callback)
-
-    def callback(self, event_object):
-        self.game = event_object.widget.get()
-
-    def submit(self):
-        """
-        Retrieve the values from each entry and check if they are valid.
-        """
-        platform = self.first_gamer_plat.get()
-        region = self.first_gamer_reg.get()
-        battle_tag = self.first_gamer_batt.get()
-
-        try:
-            o = Overwatch(platform, region, battle_tag)
-            if o.result:
-                # Simple check to see if values are valid
-                print(o.test_get_player_info())
-            else:
-                print("Invalid Profile")
-        except:
-            # Need to likely change this try/except. Debugging required
-            print("Invalid Profile")
+        new_frame = change_frame(self)
+        if self._frame is not None:
+            self._frame.destroy()
+        self._frame = new_frame
+        self._frame.pack()
 
 
-app = Tk()
-gui = FirstGUI(app)
-app.title("Game App")
-app.geometry('500x600')
-app.mainloop()
+if __name__ == "__main__":
+    """
+    Runs the application
+    """
+    app = FirstGUI()
+    app.mainloop()
